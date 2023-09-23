@@ -1,24 +1,20 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { Divider } from 'react-native-elements'
+import { db , auth } from "../../firebase"
+import { doc, updateDoc , arrayUnion, collection, arrayRemove} from "firebase/firestore";
 
 const postFooterIcons = [
     {
       name: 'Like',
       imageUrl: "https://img.icons8.com/fluency-systems-regular/48/hearts.png",
-      likedImageUrl: "https://img.icons8.com/fluency-systems-regular/48/F25081/like--v1.png"
+      likedImageUrl: "https://img.icons8.com/windows/32/000000/filled-heart.png"
     },
     {
       name: 'Comment',
       imageUrl: "https://img.icons8.com/fluency-systems-regular/48/speech-bubble--v1.png"
     },
 ]
-
-const Icon = ({ imgStyle, imgUrl}) => (
-    <TouchableOpacity>
-        <Image style={imgStyle} source={{ uri: imgUrl}} />
-    </TouchableOpacity>
-) 
 
 const Likes = ({ likes_by_users }) => (
     <View style={{ flexDirection: 'row', marginTop: 4 }}>
@@ -58,18 +54,23 @@ const Comments = ({comments}) => (
 
 )
 
-const PostFooter = ({ navigation }) => (
+const PostFooter = ({ navigation, handleLike , likes_by_users }) => (
 <View style={{ flexDirection: 'row'}}>
     <View style={styles.leftFooterIconsContainer}>
-    <Icon imgStyle={styles.footerIcon} imgUrl={postFooterIcons[0].imageUrl} />
-    <View>
-        <TouchableOpacity onPress={() => navigation.push('CommentScreen')} >
-        <Image 
-            style={styles.footerIcon} 
-            source={{ uri: "https://img.icons8.com/fluency-systems-regular/48/speech-bubble--v1.png"}} 
+      <TouchableOpacity onPress={() =>handleLike(likes_by_users)}>
+        <Image
+          style={styles.footerIcon}
+          source={{ uri: likes_by_users.includes(auth.currentUser.email) ? postFooterIcons[0].likedImageUrl : postFooterIcons[0].imageUrl }}
         />
-        </TouchableOpacity>
-    </View>
+      </TouchableOpacity>
+      <View>
+          <TouchableOpacity onPress={() => navigation.push('CommentScreen')} >
+          <Image 
+              style={styles.footerIcon} 
+              source={{ uri: "https://img.icons8.com/fluency-systems-regular/48/speech-bubble--v1.png"}} 
+          />
+          </TouchableOpacity>
+      </View>
     </View>
 </View>
 )
@@ -94,14 +95,35 @@ const PostImage = ({ imageUrl }) => (
 </View>
 )
 
-const Post = ({ navigation , username,profilePic,imageUrl,caption,timestamp,likes,user_uid,likes_by_users,comments}) => 
-   (
+const Post = ({ id,navigation , username,profilePic,imageUrl,caption,timestamp,likes,user_uid,likes_by_users,comments}) => {
+  const handleLike = (likes_by_users) => {
+    const currentLikeStatus = !likes_by_users.includes(
+      auth.currentUser.email
+    )
+
+    const docRef = doc(db,'posts',id)
+
+    updateDoc(docRef, {
+      likes_by_users: currentLikeStatus?
+      arrayUnion(auth.currentUser.email):
+      arrayRemove(auth.currentUser.email)
+    })
+    .then(()=> {
+      console.log('Document successfully updated')
+    })
+    .catch(error=> {
+      console.error('Error updating document: ', error)
+    })
+
+  }
+  
+  return (
     <View style={{ marginBottom: 30 }}>
         <Divider width={1} orientation='vertical'  />
       <PostHeader profilePic={profilePic} username={username}/>
       <PostImage imageUrl={imageUrl} />
       <View style={{ marginHorizontal: 15, marginTop: 10 }}>
-        <PostFooter navigation={navigation}/>
+        <PostFooter navigation={navigation} handleLike={handleLike} likes_by_users={likes_by_users}/>
         <Likes likes_by_users={likes_by_users} />
         <Caption caption={caption} username={username}/>
         <CommentSection comments={comments} />
@@ -109,7 +131,7 @@ const Post = ({ navigation , username,profilePic,imageUrl,caption,timestamp,like
       </View>
     </View>
   )
-
+}
 
 export default Post
 
