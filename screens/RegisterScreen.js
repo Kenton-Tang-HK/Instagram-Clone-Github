@@ -6,7 +6,7 @@ import Validator from 'email-validator'
 import validUrl from 'valid-url'
 
 const INSTAGRAM_LOGO_2 = 'https://1000logos.net/wp-content/uploads/2017/02/Logo-Instagram-1.png'
-const PLACEHOLDER_IMG = 'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-network-placeholder-png-image_3416659.jpg'
+const PLACEHOLDER_IMG = 'https://surgassociates.com/wp-content/uploads/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.jpg'
 
 const RegisterScreen = ({ navigation }) => {
     const [ email , setEmail ] = useState("");    

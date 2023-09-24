@@ -54,7 +54,7 @@ const Comments = ({comments}) => (
 
 )
 
-const PostFooter = ({ navigation, handleLike , likes_by_users }) => (
+const PostFooter = ({ navigation, handleLike , likes_by_users ,enterComment,id,comments}) => (
 <View style={{ flexDirection: 'row'}}>
     <View style={styles.leftFooterIconsContainer}>
       <TouchableOpacity onPress={() =>handleLike(likes_by_users)}>
@@ -64,7 +64,7 @@ const PostFooter = ({ navigation, handleLike , likes_by_users }) => (
         />
       </TouchableOpacity>
       <View>
-          <TouchableOpacity onPress={() => navigation.push('CommentScreen')} >
+          <TouchableOpacity onPress={() => enterComment(id,comments)} >
           <Image 
               style={styles.footerIcon} 
               source={{ uri: "https://img.icons8.com/fluency-systems-regular/48/speech-bubble--v1.png"}} 
@@ -95,14 +95,14 @@ const PostImage = ({ imageUrl }) => (
 </View>
 )
 
-const Post = ({ id,navigation , username,profilePic,imageUrl,caption,timestamp,likes,user_uid,likes_by_users,comments}) => {
+const Post = ({ id,navigation , username,profilePic,imageUrl,caption,timestamp,likes,user_uid,likes_by_users,comments,enterComment}) => {
   const handleLike = (likes_by_users) => {
     const currentLikeStatus = !likes_by_users.includes(
       auth.currentUser.email
     )
 
     const docRef = doc(db,'posts',id)
-
+      
     updateDoc(docRef, {
       likes_by_users: currentLikeStatus?
       arrayUnion(auth.currentUser.email):
@@ -123,7 +123,7 @@ const Post = ({ id,navigation , username,profilePic,imageUrl,caption,timestamp,l
       <PostHeader profilePic={profilePic} username={username}/>
       <PostImage imageUrl={imageUrl} />
       <View style={{ marginHorizontal: 15, marginTop: 10 }}>
-        <PostFooter navigation={navigation} handleLike={handleLike} likes_by_users={likes_by_users}/>
+        <PostFooter navigation={navigation} handleLike={handleLike} likes_by_users={likes_by_users} enterComment={enterComment} id={id} comments={comments} />
         <Likes likes_by_users={likes_by_users} />
         <Caption caption={caption} username={username}/>
         <CommentSection comments={comments} />

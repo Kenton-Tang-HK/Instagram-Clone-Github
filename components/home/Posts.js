@@ -22,6 +22,13 @@ const Posts = ({ navigation }) => {
     return unsubscribe;
   },[])
 
+  const enterComment = (id,comments) => [
+    navigation.navigate("CommentScreen", {
+      id: id,
+      comments: comments,
+    })
+  ]
+
   return (
     <View>
       { posts.map(({id, data: {username,profilePic,imageUrl,caption,timestamp,likes,user_uid,likes_by_users,comments}}) => (
@@ -38,6 +45,7 @@ const Posts = ({ navigation }) => {
             user_uid={user_uid}
             likes_by_users={likes_by_users}
             comments={comments}
+            enterComment={enterComment}
           />
        ))} 
     </View>
